@@ -16,22 +16,27 @@ const pool = new Pool({
     port: 5432
 });
 
-app.get('/', (req, res) => {
-    res.status(200).json({ message: 'hello world' });
+app.get('/', async (req, res) => {
+    try {
+        const tasks = await pool.query('SELECT * FROM task');
+        res.json(tasks.rows);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
-app.post('/new', (req, res) => {
+app.post('/new', async (req, res) => {
     const { description } = req.body;
     if (!description) {
         return res.status(400).json({ error: 'Description is required' });
     }
 
-    pool.query('INSERT INTO task (description) VALUES ($1) RETURNING id', [description], (error, result) => {
-        if (error) {
-            return res.status(500).json({ error: error.message });
-        }
-        res.status(200).json({ id: result.rows[0].id });
-    });
+    try {
+        const newTask = await pool.query('INSERT INTO task (description) VALUES ($1) RETURNING *', [description]);
+        res.status(201).json(newTask.rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.listen(port, () => {
