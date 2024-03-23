@@ -1,0 +1,10 @@
+### Get tasks
+GET http://localhost:3001/
+
+### Add new task
+POST http://localhost:3001/new
+Content-Type: application/json
+
+{
+    "description": "Test from Shankar"
+}
