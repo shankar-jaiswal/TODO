@@ -16,7 +16,7 @@ class Todos {
                 this.#readJson(tasksJson);
                 resolve(this.#tasks);
             } catch (error) {
-                reject(error);
+                reject(new Error('Failed to fetch tasks')); // Corrected error message
             }
         });
     }
@@ -33,7 +33,7 @@ class Todos {
             const newTaskJson = await response.json();
             return this.#addToArray(newTaskJson.id, newTaskJson.description);
         } catch (error) {
-            throw new Error('Failed to save task');
+            throw new Error('Failed to save task'); // Corrected error message
         }
     }
 
@@ -45,7 +45,7 @@ class Todos {
             this.#removeFromArray(id);
             return id;
         } catch (error) {
-            throw new Error('Failed to remove task');
+            throw new Error('Failed to remove task'); // Corrected error message
         }
     }
 
