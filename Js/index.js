@@ -1,30 +1,29 @@
 const BACKEND_ROOT_URL = 'http://localhost:3001';
+import { Todos } from './class/Todos.js';
+
+const todos = new Todos(BACKEND_ROOT_URL);
 
 const list = document.querySelector('ul');
 const input = document.querySelector('input');
 
-input.disabled = false;
+input.disabled = true;
 
 const renderTask = (task) => {
     const li = document.createElement('li');
     li.setAttribute('class', 'list-group-item');
-    li.textContent = task.description; // Assuming your task object has a 'description' property
+    li.innerHTML = task.getText(); 
     list.appendChild(li);
 }
 
-const getTasks = async () => {
-    try {
-        const response = await fetch(`${BACKEND_ROOT_URL}/`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch tasks');
-        }
-        const data = await response.json();
-        data.forEach((task) => {
-            renderTask(task);
-        });
-    } catch (error) {
-        console.error(error);
-    }
+const getTasks = () => {
+    todos.getTasks().then((tasks) => {
+        tasks.forEach(task => {
+            renderTask(task)
+        })
+        input.disabled = false;
+    }).catch ((error) =>{
+        alert(error)
+    })
 }
 
 const saveTask = async (task) => {
@@ -47,14 +46,18 @@ const saveTask = async (task) => {
     }
 }
 
-getTasks();
 
-input.addEventListener('keypress', async (event) => {
+
+input.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
         const task = input.value.trim();
         if (task !== '') {
-            await saveTask(task);
-        }
+            todos.addTask(task).then((task) => {
+                renderTask(task)
+                input.value = '';
+            })
+        }    
     }
 });
+getTasks();
